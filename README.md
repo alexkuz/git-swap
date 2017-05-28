@@ -8,3 +8,9 @@ Interactive, minimal, pure-shell menu for switching between git branches
 ```
 > npm i -g git-swap
 ```
+
+## Usage
+
+```
+> git swap [pattern]
+```
