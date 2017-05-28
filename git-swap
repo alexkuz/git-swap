@@ -1,0 +1,50 @@
+#!/bin/sh
+
+function menu {
+	sel=0
+	result_var=$1
+	args=("$@")
+	items=("${args[@]:1}")
+	items_len=${#items[@]}
+	while true; do
+		i=0
+		for item in "${items[@]}"; do
+			if [ "$i" = "$sel" ]; then
+				echo "\033[32;1m❯ $item\033[0m"
+			else
+				echo "  $item"
+			fi
+			i=$(($i+1))
+		done
+
+		read -rsn1 char
+		case "$char" in
+			$'\033')
+				read -rsn1 -t 1 char
+				if [ $? == 1 ]; then
+					exit
+				fi
+				case "$char" in
+					$'\033') exit
+					;;
+					"[")
+						read -rsn1 input
+				    	case "$input" in
+				    		"A") sel=$(( ($sel + $items_len - 1) % items_len ))
+				    		;;
+				    		"B") sel=$(( ($sel + 1) % items_len ))
+				        	;;
+				        esac
+				    ;;
+			    esac
+			;;
+			$'\000') eval $result_var="${items[$sel]}"; break
+			;;
+		esac
+		echo "\033[${items_len}A\c"
+	done
+}
+
+branches=$(git for-each-ref refs/heads --sort='-authordate' --format='%(refname:strip=2)')
+menu result $branches
+git checkout $result
