@@ -1,2 +1,2 @@
 # git-swap
-Interactive shell menu for switching between git branches
+Interactive, minimal, pure-shell menu for switching between git branches
