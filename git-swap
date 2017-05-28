@@ -45,6 +45,11 @@ function menu {
 	done
 }
 
-branches=$(git for-each-ref refs/heads --sort='-authordate' --format='%(refname:strip=2)')
+if [[ $1 == *"*"* ]]; then
+	pattern=$1
+else
+	pattern="*$1*"
+fi
+branches=$(git for-each-ref "refs/heads/$pattern" --sort='-authordate' --format='%(refname:strip=2)' $@)
 menu result $branches
 git checkout $result
