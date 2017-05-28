@@ -1,12 +1,26 @@
 #!/bin/sh
 
+ITEMS_LIMIT=15
+
 function menu {
 	sel=0
 	result_var=$1
 	args=("$@")
-	items=("${args[@]:1}")
-	items_len=${#items[@]}
+	args_len=${#args[@]}
+	if [ $args_len -le $(($ITEMS_LIMIT + 1)) ]; then
+		show_all=1
+	else
+		show_all=0
+	fi
+
 	while true; do
+		if [ "$show_all" = "1" ]; then
+			items=("${args[@]:1}")
+		else
+			items=("${args[@]:1:$(($ITEMS_LIMIT + 1))}" "...")
+		fi
+		items_len=${#items[@]}
+
 		i=0
 		for item in "${items[@]}"; do
 			if [ "$i" = "$sel" ]; then
@@ -30,9 +44,17 @@ function menu {
 					"[")
 						read -rsn1 input
 				    	case "$input" in
-				    		"A") sel=$(( ($sel + $items_len - 1) % items_len ))
+				    		"A")
+								sel=$(( ($sel + $items_len - 1) % items_len ))
+								if [ $show_all = 0 ] && [ $(($sel + 1)) = $items_len ]; then
+									sel=$(($sel - 1))
+								fi
 				    		;;
-				    		"B") sel=$(( ($sel + 1) % items_len ))
+				    		"B")
+								sel=$(( ($sel + 1) % items_len ))
+								if [ $(($sel + 1)) = $items_len ]; then
+									show_all=1
+								fi
 				        	;;
 				        esac
 				    ;;
