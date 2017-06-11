@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "description": "Interactive, pure-shell menu for switching between git branches",
   "bin": {
-    "git-swap": "git-swap"
+    "git-swap": "bin/git-swap"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

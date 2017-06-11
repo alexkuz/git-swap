@@ -1,0 +1,27 @@
+#!/bin/sh
+
+function git_swap {
+	source __shell_menu.sh
+
+	if [[ $1 == *"*"* ]]; then
+		pattern=$1
+	else
+		pattern="*$1*"
+	fi
+
+	branches=$(git for-each-ref "refs/heads/$pattern" --sort="-authordate" --format='"'"%(refname:strip=2)//    (%(authordate:relative)) \033[0m%(subject) \033[33mby %(authorname)\033[0m"'"' $@)
+
+	eval "branches=($branches)"
+
+	menu result "${branches[@]}"
+
+	git checkout $result
+}
+
+if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+  export -f git_swap
+else
+  git_swap "${@}"
+  exit $?
+fi
+
