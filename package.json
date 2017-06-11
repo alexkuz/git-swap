@@ -1,6 +1,6 @@
 {
   "name": "git-swap",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Interactive, pure-shell menu for switching between git branches",
   "bin": {
     "git-swap": "bin/git-swap"
@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/alexkuz/git-swap/issues"
   },
-  "homepage": "https://github.com/alexkuz/git-swap#readme"
+  "homepage": "https://github.com/alexkuz/git-swap#readme",
+  "dependencies": {
+    "shell-menu": "^1.0.0"
+  }
 }

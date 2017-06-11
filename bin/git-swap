@@ -1,6 +1,10 @@
 #!/bin/sh
 
 function git_swap {
+	if [ -e ../shell-menu/bin ]; then
+		NPM_MODULE_PATH=$(cd ../shell-menu/bin; pwd)
+		PATH="$NPM_MODULE_PATH:$PATH"
+	fi
 	source __shell_menu.sh
 
 	if [[ $1 == *"*"* ]]; then
