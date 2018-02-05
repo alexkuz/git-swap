@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/alexkuz/git-swap#readme",
   "dependencies": {
-    "shell-menu": "^1.0.0"
+    "shell-menu": "^1.0.1"
   }
 }
