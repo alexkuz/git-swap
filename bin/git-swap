@@ -6,9 +6,9 @@ function find_module_path {
 	NPM_PATH="$(dirname $(dirname "$0"))"
 	NPM_DIR="$(dirname $(dirname "$0") | xargs basename)"
 	if [ $NPM_DIR = ".npm" ]; then
-		NPM_ABS_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$MODULE/bin"
-		NPM_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$PARENT_MODULE/node_modules/$MODULE/bin"
-		YARN_SHELL_MENU_BIN_PATH="$HOME/.config/yarn/global/node_modules/$MODULE/bin"
+		NPM_ABS_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$MODULE/bin/"
+		NPM_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$PARENT_MODULE/node_modules/$MODULE/bin/"
+		YARN_SHELL_MENU_BIN_PATH="$HOME/.config/yarn/global/node_modules/$MODULE/bin/"
 		if [ -e $NPM_ABS_SHELL_MENU_BIN_PATH ]; then
 			echo $NPM_ABS_SHELL_MENU_BIN_PATH
 		elif [ -e $NPM_SHELL_MENU_BIN_PATH ]; then
@@ -16,14 +16,12 @@ function find_module_path {
 		elif [ -e $YARN_SHELL_MENU_BIN_PATH ]; then
 			echo $YARN_SHELL_MENU_BIN_PATH
 		fi
-	else
-		echo "."
 	fi
 }
 
 function git_swap {
 	MODULE_PATH=$(find_module_path git-swap shell-menu)
-	source "$MODULE_PATH/__shell_menu.sh"
+	source "${MODULE_PATH}__shell_menu.sh"
 
 	if [[ $1 == *"*"* ]]; then
 		pattern=$1
@@ -46,4 +44,3 @@ else
   git_swap "${@}"
   exit $?
 fi
-
