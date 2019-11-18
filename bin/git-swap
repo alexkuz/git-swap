@@ -1,44 +1,68 @@
 #!/bin/sh
 
-function find_module_path {
+find_module_path() {
 	PARENT_MODULE=$1
 	MODULE=$2
-	NPM_PATH="$(dirname $(dirname "$0"))"
-	NPM_DIR="$(dirname $(dirname "$0") | xargs basename)"
-	if [ $NPM_DIR = ".npm" ]; then
+	NPM_PATH="$(dirname "$(dirname "$0")")"
+	NPM_DIR="$(dirname "$(dirname "$0")" | xargs basename)"
+	if [ "$NPM_DIR" = ".npm" ]; then
 		NPM_ABS_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$MODULE/bin/"
 		NPM_SHELL_MENU_BIN_PATH="$NPM_PATH/lib/node_modules/$PARENT_MODULE/node_modules/$MODULE/bin/"
 		YARN_SHELL_MENU_BIN_PATH="$HOME/.config/yarn/global/node_modules/$MODULE/bin/"
-		if [ -e $NPM_ABS_SHELL_MENU_BIN_PATH ]; then
-			echo $NPM_ABS_SHELL_MENU_BIN_PATH
-		elif [ -e $NPM_SHELL_MENU_BIN_PATH ]; then
-			echo $NPM_SHELL_MENU_BIN_PATH
-		elif [ -e $YARN_SHELL_MENU_BIN_PATH ]; then
-			echo $YARN_SHELL_MENU_BIN_PATH
+		if [ -e "$NPM_ABS_SHELL_MENU_BIN_PATH" ]; then
+			echo "$NPM_ABS_SHELL_MENU_BIN_PATH"
+		elif [ -e "$NPM_SHELL_MENU_BIN_PATH" ]; then
+			echo "$NPM_SHELL_MENU_BIN_PATH"
+		elif [ -e "$YARN_SHELL_MENU_BIN_PATH" ]; then
+			echo "$YARN_SHELL_MENU_BIN_PATH"
 		fi
 	fi
 }
 
-function git_swap {
+git_swap() {
 	MODULE_PATH=$(find_module_path git-swap shell-menu)
-	source "${MODULE_PATH}__shell_menu.sh"
+	# shellcheck disable=SC1090
+	. "${MODULE_PATH}__shell_menu.sh"
+	ALL_BRANCHES=0
 
-	if [[ $1 == *"*"* ]]; then
-		pattern=$1
+	while getopts ":a" opt; do
+	  case "$opt" in
+	    a) ALL_BRANCHES=1
+			;;
+			*)
+	  esac
+	done
+
+	shift $((OPTIND - 1))
+
+	if [[ "$1" == *"*"* ]]; then
+		PATTERN=$1
 	else
-		pattern="*$1*"
+		PATTERN="*$1*"
 	fi
 
-	branches=$(git for-each-ref "refs/heads/$pattern" --sort="-authordate" --format='"'"%(refname:strip=2)//    (%(authordate:relative)) \033[0m%(subject) \033[33mby %(authorname)\033[0m"'"' $@)
+	if [ "$ALL_BRANCHES" = "1" ]; then
+		PATTERNS=("refs/heads/$PATTERN" "refs/remotes/*/$PATTERN")
+	else
+		PATTERNS=("refs/heads/$PATTERN")
+	fi
 
-	eval "branches=($branches)"
+	BRANCHES=$(git for-each-ref "${PATTERNS[@]}" \
+		--sort="-authordate" \
+		--format='"'"%(refname:strip=2)//    (%(authordate:relative)) \033[0m%(subject) \033[33mby %(authorname)\033[0m"'"' "$@")
 
-	menu result "${branches[@]}"
+	eval "BRANCHES=($BRANCHES)"
 
-	git checkout $result
+	RESULT=""
+
+	menu RESULT "${BRANCHES[@]}"
+
+	BRANCH=$(echo $RESULT | sed -e "s/.*\///")
+
+	git checkout "$BRANCH" 2>/dev/null || git checkout -b "$BRANCH"
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f git_swap
 else
   git_swap "${@}"
