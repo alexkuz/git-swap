@@ -50,6 +50,7 @@ git_swap() {
 	BRANCHES=$(git for-each-ref "${PATTERNS[@]}" \
 		--sort="-authordate" \
 		--format='"'"%(refname:strip=2)//    (%(authordate:relative)) \033[0m%(subject) \033[33mby %(authorname)\033[0m"'"' "$@")
+	BRANCHES=$(echo "$BRANCHES" | sed 's/\`/\\\`/g')
 
 	eval "BRANCHES=($BRANCHES)"
 
